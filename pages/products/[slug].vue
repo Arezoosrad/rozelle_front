@@ -1,6 +1,8 @@
 <script setup lang="ts">
 const route = useRoute()
 const { data, pending, error } = useProduct(computed(() => String(route.params.slug)))
+const productId = computed(() => data.value?.id)
+const { data: reviews, pending: reviewsPending, error: reviewsError } = useReviews(productId)
 watchEffect(() => {
   if (data.value) useSeoMeta({
     title: `${data.value.name} | Rozelle`,
@@ -34,6 +36,22 @@ watchEffect(() => {
           افزودن به سبد و موجودی در API فعلی backend برای عملیات کاربری expose نشده‌اند.
         </div>
       </div>
+
+        <section class="mt-12 border-t border-powder-blue pt-8">
+          <h2 class="text-2xl font-light">دیدگاه‌ها</h2>
+          <p v-if="reviewsPending" class="mt-5 text-sm text-mist-gray">در حال بارگذاری دیدگاه‌ها…</p>
+          <p v-else-if="reviewsError" class="mt-5 text-sm text-mist-gray">دیدگاه‌ها در دسترس نیستند.</p>
+          <p v-else-if="!reviews?.length" class="mt-5 text-sm text-mist-gray">هنوز دیدگاهی ثبت نشده است.</p>
+          <div v-else class="mt-6 space-y-6">
+            <article v-for="review in reviews" :key="review.id" class="border-b border-powder-blue/60 pb-6">
+              <div class="flex items-center justify-between gap-4">
+                <h3 class="text-sm font-medium">{{ review.title || "دیدگاه مشتری" }}</h3>
+                <span class="text-xs text-mist-gray">{{ review.rating }}/5</span>
+              </div>
+              <p v-if="review.body" class="mt-2 text-sm leading-7 text-mist-gray">{{ review.body }}</p>
+            </article>
+          </div>
+        </section>
     </div>
   </section>
 </template>

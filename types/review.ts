@@ -1,0 +1,1 @@
+export interface Review { id: number; product: number; rating: number; title: string; body: string; created_at: string }
